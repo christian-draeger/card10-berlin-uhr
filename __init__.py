@@ -28,28 +28,13 @@ def render_segment(disp, row, pos, color, thin=False):
               filled=True)
 
 
-def render_hour_x5(disp, pos):
-    localtime = utime.localtime()
-    hours = localtime[3]
-    active_segments = int(hours // 5)
-
+def render_hour(disp, row, active_segments, pos):
     color = Colors.red_on if active_segments > pos else Colors.red_off
-    render_segment(disp, 1, pos, color)
+    render_segment(disp, row, pos, color)
 
 
-def render_hour_x1(disp, pos):
-    localtime = utime.localtime()
-    hours = localtime[3]
-    active_segments = hours % 5
-
-    color = Colors.red_on if active_segments > pos else Colors.red_off
-    render_segment(disp, 2, pos, color)
-
-
-def render_minute_x5(disp, pos):
-    localtime = utime.localtime()
-    mins = localtime[4]
-    active_segments = int(mins // 5) > pos
+def render_minute_x5(disp, pos, minutes):
+    active_segments = int(minutes // 5) > pos
     is_quarter = (pos + 1) % 3 is 0
     color = Colors.yellow_on if active_segments > pos else Colors.yellow_off
 
@@ -62,27 +47,31 @@ def render_minute_x5(disp, pos):
     render_segment(disp, 3, pos, color, True)
 
 
-def render_minute_x1(disp, pos):
-    localtime = utime.localtime()
-    mins = localtime[4]
-    active_segments = mins % 5
+def render_minute_x1(disp, pos, minutes):
+    active_segments = minutes % 5
 
     color = Colors.yellow_on if active_segments > pos else Colors.yellow_off
     render_segment(disp, 4, pos, color)
 
 
 def render_hours(disp):
-    for i in range(4):
-        render_hour_x5(disp, i)
-        render_hour_x1(disp, i)
+    localtime = utime.localtime()
+    hours = localtime[3]
+    row1_active_segments = int(hours // 5)
+    row2_active_segments = hours % 5
+    for index in range(4):
+        render_hour(disp, 1, row1_active_segments, index)
+        render_hour(disp, 2, row2_active_segments, index)
 
 
 def render_minutes(disp):
+    localtime = utime.localtime()
+    minutes = localtime[4]
     for i in range(11):
-        render_minute_x5(disp, i)
+        render_minute_x5(disp, i, minutes)
 
     for i in range(4):
-        render_minute_x1(disp, i)
+        render_minute_x1(disp, i, minutes)
 
 
 def render(disp):
