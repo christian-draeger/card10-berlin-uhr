@@ -21,78 +21,65 @@ def render_bg(disp):
     disp.rect(0, 0, 160, 80, col=COLOR_BG, filled=True)
 
 
-def render_hour_x5(disp, pos):
-    disp.rect(SEGMENT_WIDTH * pos + OFFSET,
-              OFFSET,
-              SEGMENT_WIDTH * (pos + 1) - OFFSET,
-              SEGMENT_HEIGHT - OFFSET,
-              col=COLOR_RED_ACTIVE,
-              filled=True)
-
-
-def render_hour_x1(disp, pos):
-    disp.rect(SEGMENT_WIDTH * pos + OFFSET,
-              SEGMENT_HEIGHT,
-              SEGMENT_WIDTH * (pos + 1) - OFFSET,
-              SEGMENT_HEIGHT * 2 - OFFSET,
-              col=COLOR_RED_INACTIVE,
-              filled=True)
-
-
-def render_minute_x5(disp, pos):
-    is_quarter = (pos + 1) % 3 is 0
-    color = COLOR_RED_ACTIVE if is_quarter else COLOR_YELLOW_ACTIVE
-
-    disp.rect(SEGMENT_WIDTH_THIN * pos + OFFSET + 3,
-              SEGMENT_HEIGHT * 2,
-              SEGMENT_WIDTH_THIN * (pos + 1) - OFFSET + 3,
-              SEGMENT_HEIGHT * 3 - OFFSET,
+def render_segment(disp, row, pos, color, thin=False):
+    width = 14 if thin else 40
+    offset = 1
+    extra_offset = 3 if thin else 0
+    height = 20
+    disp.rect(width * pos + offset + extra_offset,
+              height * (row - 1),
+              width * (pos + 1) - offset + extra_offset,
+              height * row - offset,
               col=color,
               filled=True)
 
 
+def render_hour_x5(disp, pos):
+    localtime = utime.localtime()
+    hours = localtime[3]
+    on = int(hours // 5) > pos
+    color = COLOR_RED_ACTIVE if on else COLOR_RED_INACTIVE
+    render_segment(disp, 1, pos, color)
+
+
+def render_hour_x1(disp, pos):
+    color = COLOR_RED_INACTIVE
+    render_segment(disp, 2, pos, color)
+
+
+def render_minute_x5(disp, pos):
+    localtime = utime.localtime()
+    mins = localtime[4]
+    on = int(mins // 5) > pos
+    is_quarter = (pos + 1) % 3 is 0
+    color = COLOR_RED_ACTIVE if is_quarter else COLOR_YELLOW_ACTIVE
+
+    render_segment(disp, 3, pos, color, True)
+
+
 def render_minute_x1(disp, pos):
-    disp.rect(SEGMENT_WIDTH * pos + OFFSET,
-              SEGMENT_HEIGHT * 3,
-              SEGMENT_WIDTH * (pos + 1) - OFFSET,
-              SEGMENT_HEIGHT * 4 - OFFSET,
-              col=COLOR_YELLOW_INACTIVE,
-              filled=True)
+    color = COLOR_YELLOW_ACTIVE
+    render_segment(disp, 4, pos, color)
 
 
-def render_hours_x5(disp):
-    # localtime = utime.localtime()
-    # hours = localtime[3]
-    # every 3rd 2px thicker
+def render_hours(disp):
     for i in range(4):
         render_hour_x5(disp, i)
-
-
-def render_hours_x1(disp):
-    # localtime = utime.localtime()
-    # hours = localtime[3]
-    for i in range(4):
         render_hour_x1(disp, i)
 
 
-def render_minutes_x5(disp):
+def render_minutes(disp):
     for i in range(11):
         render_minute_x5(disp, i)
 
-
-def render_minutes_x1(disp):
-    # localtime = utime.localtime()
-    # mins = localtime[4]
     for i in range(4):
         render_minute_x1(disp, i)
 
 
 def render(disp):
     render_bg(disp)
-    render_hours_x5(disp)
-    render_hours_x1(disp)
-    render_minutes_x5(disp)
-    render_minutes_x1(disp)
+    render_hours(disp)
+    render_minutes(disp)
     disp.update()
     disp.close()
 
