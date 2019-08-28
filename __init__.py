@@ -37,13 +37,18 @@ def render_segment(disp, row, pos, color, thin=False):
 def render_hour_x5(disp, pos):
     localtime = utime.localtime()
     hours = localtime[3]
-    on = int(hours // 5) > pos
-    color = COLOR_RED_ACTIVE if on else COLOR_RED_INACTIVE
+    active_segments = int(hours // 5)
+
+    color = COLOR_RED_ACTIVE if active_segments > pos else COLOR_RED_INACTIVE
     render_segment(disp, 1, pos, color)
 
 
 def render_hour_x1(disp, pos):
-    color = COLOR_RED_INACTIVE
+    localtime = utime.localtime()
+    hours = localtime[3]
+    active_segments = hours % 5
+
+    color = COLOR_RED_ACTIVE if active_segments > pos else COLOR_RED_INACTIVE
     render_segment(disp, 2, pos, color)
 
 
