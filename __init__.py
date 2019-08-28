@@ -2,23 +2,17 @@ import utime
 import leds
 import display
 
-WIDTH = 160
-HEIGHT = 80
-OFFSET = 1
 
-SEGMENT_WIDTH = 40
-SEGMENT_WIDTH_THIN = 14
-SEGMENT_HEIGHT = 20
-
-COLOR_BG = (80, 80, 80)
-COLOR_RED_ACTIVE = (255, 0, 0)
-COLOR_RED_INACTIVE = (150, 0, 0)
-COLOR_YELLOW_ACTIVE = (255, 255, 0)
-COLOR_YELLOW_INACTIVE = (150, 150, 0)
+class Colors(object):
+    background = (20, 20, 20)
+    red_on = (255, 0, 0)
+    red_off = (60, 0, 0)
+    yellow_on = (255, 255, 0)
+    yellow_off = (60, 60, 0)
 
 
 def render_bg(disp):
-    disp.rect(0, 0, 160, 80, col=COLOR_BG, filled=True)
+    disp.rect(0, 0, 160, 80, col=Colors.background, filled=True)
 
 
 def render_segment(disp, row, pos, color, thin=False):
@@ -39,7 +33,7 @@ def render_hour_x5(disp, pos):
     hours = localtime[3]
     active_segments = int(hours // 5)
 
-    color = COLOR_RED_ACTIVE if active_segments > pos else COLOR_RED_INACTIVE
+    color = Colors.red_on if active_segments > pos else Colors.red_off
     render_segment(disp, 1, pos, color)
 
 
@@ -48,22 +42,32 @@ def render_hour_x1(disp, pos):
     hours = localtime[3]
     active_segments = hours % 5
 
-    color = COLOR_RED_ACTIVE if active_segments > pos else COLOR_RED_INACTIVE
+    color = Colors.red_on if active_segments > pos else Colors.red_off
     render_segment(disp, 2, pos, color)
 
 
 def render_minute_x5(disp, pos):
     localtime = utime.localtime()
     mins = localtime[4]
-    on = int(mins // 5) > pos
+    active_segments = int(mins // 5) > pos
     is_quarter = (pos + 1) % 3 is 0
-    color = COLOR_RED_ACTIVE if is_quarter else COLOR_YELLOW_ACTIVE
+    color = Colors.yellow_on if active_segments > pos else Colors.yellow_off
+
+    if active_segments and is_quarter:
+        color = Colors.red_on
+
+    if not active_segments and is_quarter:
+        color = Colors.red_off
 
     render_segment(disp, 3, pos, color, True)
 
 
 def render_minute_x1(disp, pos):
-    color = COLOR_YELLOW_ACTIVE
+    localtime = utime.localtime()
+    mins = localtime[4]
+    active_segments = mins % 5
+
+    color = Colors.yellow_on if active_segments > pos else Colors.yellow_off
     render_segment(disp, 4, pos, color)
 
 
