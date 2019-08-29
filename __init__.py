@@ -28,15 +28,14 @@ def render_segment(disp, row, pos, color, thin=False):
               filled=True)
 
 
-def render_hour(disp, row, active_segments, pos):
-    color = Colors.red_on if active_segments > pos else Colors.red_off
-    render_segment(disp, row, pos, color)
+def on_off_color_calc(active_segments, pos):
+    return Colors.red_on if active_segments > pos else Colors.red_off
 
 
 def render_minute_x5(disp, pos, minutes):
     active_segments = int(minutes // 5) > pos
     is_quarter = (pos + 1) % 3 is 0
-    color = Colors.yellow_on if active_segments > pos else Colors.yellow_off
+    color = Colors.yellow_on if active_segments else Colors.yellow_off
 
     if active_segments and is_quarter:
         color = Colors.red_on
@@ -57,27 +56,36 @@ def render_minute_x1(disp, pos, minutes):
 def render_hours(disp):
     localtime = utime.localtime()
     hours = localtime[3]
-    row1_active_segments = int(hours // 5)
-    row2_active_segments = hours % 5
     for index in range(4):
-        render_hour(disp, 1, row1_active_segments, index)
-        render_hour(disp, 2, row2_active_segments, index)
+        row1_segment_color = on_off_color_calc(int(hours // 5), index)
+        row2_segment_color = on_off_color_calc(hours % 5, index)
+        render_segment(disp, 1, index, row1_segment_color)
+        render_segment(disp, 2, index, row2_segment_color)
 
 
 def render_minutes(disp):
     localtime = utime.localtime()
     minutes = localtime[4]
-    for i in range(11):
-        render_minute_x5(disp, i, minutes)
+    for index in range(11):
+        render_minute_x5(disp, index, minutes)
 
-    for i in range(4):
-        render_minute_x1(disp, i, minutes)
+    for index in range(4):
+        render_minute_x1(disp, index, minutes)
+
+
+def render_seconds(disp):
+    localtime = utime.localtime()
+    secs = localtime[5]
+
+    if secs <= 10:
+        disp.rect(80, 0, secs * 8, 1, col=Colors.yellow_on, filled=True)
 
 
 def render(disp):
     render_bg(disp)
     render_hours(disp)
     render_minutes(disp)
+    render_seconds(disp)
     disp.update()
     disp.close()
 
