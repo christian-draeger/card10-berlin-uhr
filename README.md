@@ -15,10 +15,13 @@ As a tribute to its inventor Dieter Binninger, it is brought back to life on the
 ### short:
 
 **hours** = Multiply the number of luminous segments from row 1 by 5 and add the result with the number of luminous segments from row 2.
+
 **minutes** = Multiply the number of luminous segments from row 3 by 5 and add the result with the number of luminous segments from row 4.
+
 **seconds** = The second indicator is the blinking led on top of the clock.
 
 ### extensive:
+
 The time is displayed in a [Positional notation](https://en.wikipedia.org/wiki/Positional_notation) to the base of 5. 
 The hours and minutes are represented by illuminated segments in four horizontally arranged stripes. 
 In the first, second and fourth lines there are four luminaires and in the third eleven luminaires. 
