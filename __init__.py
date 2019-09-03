@@ -9,6 +9,7 @@ class Colors(object):
     red_off = (60, 0, 0)
     yellow_on = (255, 255, 0)
     yellow_off = (60, 60, 0)
+    seconds = (0, 255, 0)
 
 
 def render_bg(disp):
@@ -76,9 +77,31 @@ def render_minutes(disp):
 def render_seconds(disp):
     localtime = utime.localtime()
     secs = localtime[5]
+    start_x = 80
 
-    if secs <= 10:
-        disp.rect(80, 0, secs * 8, 1, col=Colors.yellow_on, filled=True)
+    if secs > 0:
+        length = (secs - 0) * 8 if secs < 10 else 80
+        disp.rect(start_x, 0, length + start_x, 1, col=Colors.seconds, filled=True)
+
+    if secs > 10:
+        length = (secs - 10) * 8 if secs < 20 else 80
+        disp.rect(158, 0, 159, length, col=Colors.seconds, filled=True)
+
+    if secs > 20:
+        length = 160 - (secs - 20) * 8 if secs < 30 else 80
+        disp.rect(length, 78, 159, 79, col=Colors.seconds, filled=True)
+
+    if secs > 30:
+        length = 80 - (secs - 30) * 8 if secs < 40 else 0
+        disp.rect(length, 78, 159, 79, col=Colors.seconds, filled=True)
+
+    if secs > 40:
+        length = 80 - (secs - 40) * 8 if secs < 50 else 0
+        disp.rect(0, length, 1, 79, col=Colors.seconds, filled=True)
+
+    if secs > 50:
+        length = (secs - 50) * 8 if secs < 60 else 80
+        disp.rect(0, 0, length, 1, col=Colors.seconds, filled=True)
 
 
 def render(disp):
