@@ -4,13 +4,13 @@ import display
 
 
 class Colors(object):
-    background = (20, 20, 20)
-    # background = (255, 255, 255)
+    background = (0, 0, 0)
     red_on = (255, 0, 0)
     red_off = (60, 0, 0)
     yellow_on = (255, 255, 0)
     yellow_off = (60, 60, 0)
     seconds = (255, 128, 0)
+    white = (255, 255, 255)
 
 
 def render_bg(disp):
@@ -108,12 +108,14 @@ def render_seconds(disp):
 
 def render_second_hints(disp):
     for i in range(0, 161, 8):
-        disp.pixel(i, 0, col=Colors.seconds)
-        disp.pixel(i, 79, col=Colors.seconds)
+        color = Colors.white if i // 8 % 5 == 0 else Colors.seconds
+        disp.pixel(i, 0, col=color)
+        disp.pixel(i, 79, col=color)
 
     for i in range(0, 81, 8):
-        disp.pixel(0, i, col=Colors.seconds)
-        disp.pixel(159, i, col=Colors.seconds)
+        color = Colors.white if i // 8 % 5 == 0 else Colors.seconds
+        disp.pixel(0, i, col=color)
+        disp.pixel(159, i, col=color)
 
 
 def render(disp):
