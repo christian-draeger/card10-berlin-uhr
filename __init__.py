@@ -1,6 +1,7 @@
 import utime
 import leds
 import display
+import buttons
 
 
 class Colors(object):
@@ -108,22 +109,33 @@ def render_seconds(disp):
 
 def render_second_hints(disp):
     for i in range(0, 161, 8):
-        color = Colors.white if i // 8 % 5 == 0 else Colors.seconds
-        disp.pixel(i, 0, col=color)
-        disp.pixel(i, 79, col=color)
+        is_5er = i // 8 % 5 == 0
+        # color = Colors.white if is_5er else Colors.seconds
+        color = Colors.seconds
 
-    for i in range(0, 81, 8):
-        color = Colors.white if i // 8 % 5 == 0 else Colors.seconds
-        disp.pixel(0, i, col=color)
-        disp.pixel(159, i, col=color)
+        if is_5er:
+            disp.circ(i, 0, 2, col=color, filled=True)
+            disp.circ(i, 79, 2, col=color, filled=True)
+        else:
+            disp.pixel(i, 0, col=color)
+            disp.pixel(i, 79, col=color)
+
+        if i <= 80:
+            if is_5er:
+                disp.circ(0, i, 2, col=color, filled=True)
+                disp.circ(159, i, 2, col=color, filled=True)
+            else:
+                disp.pixel(0, i, col=color)
+                disp.pixel(159, i, col=color)
 
 
 def render(disp):
     render_bg(disp)
     render_hours(disp)
     render_minutes(disp)
-    render_seconds(disp)
-    render_second_hints(disp)
+    if WITH_SECONDS:
+        render_seconds(disp)
+        render_second_hints(disp)
     disp.update()
     disp.close()
 
@@ -135,9 +147,21 @@ def display_seconds():
     leds.set_rocket(1, 31) if secs % 2 == 0 else leds.set_rocket(1, 0)
 
 
+def toggle_seconds_mode():
+    button = buttons.read(buttons.BOTTOM_LEFT)
+    pressed = button != 0
+    if pressed:
+        global WITH_SECONDS
+        WITH_SECONDS = not WITH_SECONDS
+
+
+WITH_SECONDS = False
+
+
 def main():
     while True:
         display_seconds()
+        toggle_seconds_mode()
         with display.open() as disp:
             render(disp)
 
