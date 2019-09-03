@@ -1,10 +1,10 @@
-# Berlin-Uhr
+# Berlin-Uhr (aka the Mengenlehreuhr)
 ## The Berlin Clock
 
 This project is a simulation of the so called ["Berlin-Uhr"](https://de.wikipedia.org/wiki/Berlin-Uhr) that can be displayed on the the [Card10 Badge](https://card10.badge.events.ccc.de/).
 
 The clock, which was included in the Guinness Book of Records and has a total height of seven metres - including the mast - was erected on 17 June 1975, initially on the central strip of the Kurfürstendamm at the corner of Uhlandstrasse as the **"first clock in the world to display time with luminous coloured fields"**.
-As a tribute to its inventor Dieter Binninger, it is brought back to life on the card10.
+As a tribute to its inventor [Dieter Binninger](https://de.wikipedia.org/wiki/Dieter_Binninger), it is brought to life on the [Card10 Badge](https://card10.badge.events.ccc.de/).
 
 ## Demo:
 
@@ -32,6 +32,10 @@ Above the lines there is a round flashing light which is switched on or off ever
 
 ## The Original Clock:
 
-![original](https://upload.wikimedia.org/wikipedia/commons/7/7b/Berlin_Kurf%C3%BCrstendamm_113714a.jpg)
+<img width="260px" height="480px" align="left" src="https://upload.wikimedia.org/wikipedia/commons/7/7b/Berlin_Kurf%C3%BCrstendamm_113714a.jpg"/>
 
+<img width="260px" height="480px" align="center" src="https://upload.wikimedia.org/wikipedia/commons/1/13/Gedenktafel_Budapester_Str_45_%28Charl%29_Berlin_Uhr.jpg"/>
+  
+<img width="260px" height="480px" align="right" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Mengenlehreuhr.jpg/800px-Mengenlehreuhr.jpg"/>
+  
 
