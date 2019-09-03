@@ -16,14 +16,14 @@ def render_bg(disp):
 
 
 def render_segment(disp, row, pos, color, thin=False):
-    width = 14 if thin else 40
-    offset = 1
-    extra_offset = 3 if thin else 0
-    height = 20
-    disp.rect(width * pos + offset + extra_offset,
-              height * (row - 1),
-              width * (pos + 1) - offset + extra_offset,
-              height * row - offset,
+    width = 14 if thin else 39
+    extra_offset = 1 if thin else 0
+    height = 19
+    # hint: coordinate 0, 0 is on top left corner of display
+    disp.rect(width * pos + 2 + extra_offset,       # X-start coordinate
+              height * (row - 1) + 2,               # Y-start coordinate
+              width * (pos + 1) + extra_offset,     # X-End coordinate
+              height * row,                         # Y-End coordinate
               col=color,
               filled=True)
 
