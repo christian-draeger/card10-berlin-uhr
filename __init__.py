@@ -4,6 +4,14 @@ import display
 import buttons
 
 
+class Segment(object):
+    # value is representing the width in px
+    half = 79
+    quarter = 39
+    sixth = 26
+    eleventh = 14
+
+
 class Colors(object):
     background = (0, 0, 0)
     red_on = (255, 0, 0)
@@ -18,9 +26,9 @@ def render_bg(disp):
     disp.rect(0, 0, 160, 80, col=Colors.background, filled=True)
 
 
-def render_segment(disp, row, pos, color, thin=False):
-    width = 14 if thin else 39
-    extra_offset = 1 if thin else 0
+def render_segment(disp, row, pos, color, dimension):
+    width = dimension
+    extra_offset = 1 if dimension == Segment.eleventh else 0
     height = 19
     # hint: coordinate 0, 0 is on top left corner of display
     disp.rect(width * pos + 2 + extra_offset,       # X-start coordinate
@@ -46,14 +54,14 @@ def render_minute_x5(disp, pos, minutes):
     if not active_segments and is_quarter:
         color = Colors.red_off
 
-    render_segment(disp, 3, pos, color, True)
+    render_segment(disp, 3, pos, color, Segment.eleventh)
 
 
 def render_minute_x1(disp, pos, minutes):
     active_segments = minutes % 5
 
     color = Colors.yellow_on if active_segments > pos else Colors.yellow_off
-    render_segment(disp, 4, pos, color)
+    render_segment(disp, 4, pos, color, Segment.quarter)
 
 
 def render_hours(disp):
@@ -62,8 +70,8 @@ def render_hours(disp):
     for index in range(4):
         row1_segment_color = on_off_color_calc(int(hours // 5), index)
         row2_segment_color = on_off_color_calc(hours % 5, index)
-        render_segment(disp, 1, index, row1_segment_color)
-        render_segment(disp, 2, index, row2_segment_color)
+        render_segment(disp, 1, index, row1_segment_color, Segment.quarter)
+        render_segment(disp, 2, index, row2_segment_color, Segment.quarter)
 
 
 def render_minutes(disp):
@@ -74,6 +82,26 @@ def render_minutes(disp):
 
     for index in range(4):
         render_minute_x1(disp, index, minutes)
+
+
+def render_months(disp):
+    localtime = utime.localtime()
+    months = localtime[1]
+    for index in range(4):
+        row1_segment_color = on_off_color_calc(int(months // 5), index)
+        row2_segment_color = on_off_color_calc(months % 5, index)
+        render_segment(disp, 1, index, row1_segment_color, Segment.quarter)
+        render_segment(disp, 2, index, row2_segment_color, Segment.quarter)
+
+
+def render_days(disp):
+    localtime = utime.localtime()
+    days = localtime[2]
+    for index in range(11):
+        render_minute_x5(disp, index, days)
+
+    for index in range(4):
+        render_minute_x1(disp, index, days)
 
 
 def render_seconds(disp):
@@ -131,11 +159,16 @@ def render_second_hints(disp):
 
 def render(disp):
     render_bg(disp)
-    render_hours(disp)
-    render_minutes(disp)
+
     if WITH_SECONDS:
         render_seconds(disp)
         render_second_hints(disp)
+    if DATE_MODE:
+        render_months(disp)
+        render_days(disp)
+    else:
+        render_hours(disp)
+        render_minutes(disp)
     disp.update()
     disp.close()
 
@@ -147,6 +180,25 @@ def display_seconds():
     leds.set_rocket(1, 31) if secs % 2 == 0 else leds.set_rocket(1, 0)
 
 
+# ==== configuration ==== #
+
+WITH_SECONDS = False
+DATE_MODE = False
+
+
+def load_config():
+    toggle_seconds_mode()
+    toggle_date_mode()
+
+
+def toggle_date_mode():
+    button = buttons.read(buttons.TOP_RIGHT)
+    pressed = button != 0
+    if pressed:
+        global DATE_MODE
+        DATE_MODE = not DATE_MODE
+
+
 def toggle_seconds_mode():
     button = buttons.read(buttons.BOTTOM_LEFT)
     pressed = button != 0
@@ -155,13 +207,13 @@ def toggle_seconds_mode():
         WITH_SECONDS = not WITH_SECONDS
 
 
-WITH_SECONDS = False
-
+# ==== execution ==== #
 
 def main():
     while True:
+        utime.sleep_ms(900)
         display_seconds()
-        toggle_seconds_mode()
+        load_config()
         with display.open() as disp:
             render(disp)
 
