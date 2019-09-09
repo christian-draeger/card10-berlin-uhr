@@ -5,10 +5,18 @@ This project is a simulation of the so called ["Berlin-Uhr"](https://de.wikipedi
 
 The clock, which was included in the Guinness Book of Records and has a total height of seven metres - including the mast - was erected on 17 June 1975, initially on the central strip of the Kurfürstendamm at the corner of Uhlandstrasse as the **"first clock in the world to display time with luminous coloured fields"**.
 As a tribute to its inventor [Dieter Binninger](https://de.wikipedia.org/wiki/Dieter_Binninger), it is brought to life on the [Card10 Badge](https://card10.badge.events.ccc.de/).
+Releases can be found on [hatchery](https://badge.team/projects/berlin_Uhr). 
 
 ## Demo:
 
 ![demo](berlin-uhr-demo.gif)
+
+## Functions
+* fully working Berlin-Uhr simulation
+* displays seconds on the outer border of the display (can be turned on/off by lower left button)
+* press upper right button to display the current date in a berlin-uhr-ish style
+* press lower right button to show a overlay of clock/date in arabic numbers (good for beginners to learn how to read this clock)
+* automatically adjust the brightness of the display and the seconds LED
 
 ## How to read the clock
 
