@@ -3,14 +3,7 @@ import leds
 import display
 import buttons
 import light_sensor
-
-
-class Segment(object):
-    # value is representing the width in px
-    half = 79
-    quarter = 39
-    sixth = 26
-    eleventh = 14
+import simple_menu
 
 
 class Colors(object):
@@ -21,6 +14,14 @@ class Colors(object):
     yellow_off = (60, 60, 0)
     seconds = (255, 128, 0)
     white = (255, 255, 255)
+
+
+class Segment(object):
+    # value is representing the width in px
+    half = 79
+    quarter = 39
+    sixth = 26
+    eleventh = 14
 
 
 def brightness():
@@ -209,24 +210,80 @@ def toggle_date_mode():
     button = buttons.read(buttons.TOP_RIGHT)
     pressed = button != 0
     if pressed:
-        global DATE_MODE
-        DATE_MODE = not DATE_MODE
+        date_mode_toggle()
 
 
 def toggle_seconds_mode():
     button = buttons.read(buttons.BOTTOM_LEFT)
     pressed = button != 0
     if pressed:
-        global WITH_SECONDS
-        WITH_SECONDS = not WITH_SECONDS
+        seconds_toggle()
 
 
 def toggle_hint_mode():
     button = buttons.read(buttons.BOTTOM_RIGHT)
     pressed = button != 0
     if pressed:
-        global WITH_HINTS
-        WITH_HINTS = not WITH_HINTS
+        hints_toggle()
+
+
+def state_2_str(state):
+    if state:
+        return "[Y]"
+    else:
+        return "[N]"
+
+
+def seconds_toggle():
+    global WITH_SECONDS
+    WITH_SECONDS = not WITH_SECONDS
+
+
+def seconds_led_toggle():
+    global WITH_SECONDS_LED
+    WITH_SECONDS_LED = not WITH_SECONDS_LED
+
+
+def hints_toggle():
+    global WITH_HINTS
+    WITH_HINTS = not WITH_HINTS
+
+
+def dev_mode_toggle():
+    global DEV_MODE
+    DEV_MODE = not DEV_MODE
+
+
+def date_mode_toggle():
+    global DATE_MODE
+    DATE_MODE = not DATE_MODE
+
+
+def brightness_adjust_toggle():
+    global WITH_BRIGHTNESS_ADJUST
+    WITH_BRIGHTNESS_ADJUST = not WITH_BRIGHTNESS_ADJUST
+
+
+class SettingsMenu(simple_menu.Menu):
+    color_1 = Colors.background
+    color_2 = Colors.background
+    color_text = Colors.yellow_on
+    color_sel = Colors.red_on
+
+    def on_select(self, name, index):
+        self.exit()
+
+
+def setting_menu():
+    if WITH_HINTS:
+        SettingsMenu([
+            state_2_str(WITH_SECONDS) + " show seconds",
+            state_2_str(WITH_SECONDS_LED) + " seconds LED",
+            state_2_str(WITH_HINTS) + " show hints",
+            state_2_str(DEV_MODE) + " date mode",
+            state_2_str(WITH_BRIGHTNESS_ADJUST) + " auto brightness",
+            state_2_str(DEV_MODE) + " dev mode"
+        ]).run()
 
 
 # ==== execution ==== #
@@ -235,6 +292,7 @@ def main():
     while True:
         display_brightness, led_brightness, light = brightness()
         load_config()
+        setting_menu()
         with display.open() as _display:
             _display.clear(col=Colors.background)
             render(_display, display_brightness, led_brightness)
