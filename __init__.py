@@ -2,6 +2,7 @@ import utime
 import leds
 import display
 import buttons
+import light_sensor
 
 
 class Segment(object):
@@ -22,8 +23,13 @@ class Colors(object):
     white = (255, 255, 255)
 
 
-def render_bg(disp):
-    disp.rect(0, 0, 160, 80, col=Colors.background, filled=True)
+def brightness():
+    light = light_sensor.get_reading()
+    display_brightness = int(light // 4) if light >= 4 else 1
+    display_brightness = 100 if light > 300 else display_brightness
+    led_brightness = int(light // 10) if light >= 10 else 1
+    led_brightness = 31 if light > 300 else led_brightness
+    return display_brightness, led_brightness, light
 
 
 def render_segment(disp, row, pos, color, dimension):
@@ -64,49 +70,52 @@ def render_minute_x1(disp, pos, minutes):
     render_segment(disp, 4, pos, color, Segment.quarter)
 
 
-def render_hours(disp):
-    localtime = utime.localtime()
-    hours = localtime[3]
+def render_hours(disp, hours):
     for index in range(4):
         row1_segment_color = on_off_color_calc(int(hours // 5), index)
         row2_segment_color = on_off_color_calc(hours % 5, index)
         render_segment(disp, 1, index, row1_segment_color, Segment.quarter)
         render_segment(disp, 2, index, row2_segment_color, Segment.quarter)
 
+    if WITH_HINTS:
+        disp.print(str(hours), posx=70, posy=10, font=display.FONT20)
 
-def render_minutes(disp):
-    localtime = utime.localtime()
-    minutes = localtime[4]
+
+def render_minutes(disp, minutes):
     for index in range(11):
         render_minute_x5(disp, index, minutes)
 
     for index in range(4):
         render_minute_x1(disp, index, minutes)
 
+    if WITH_HINTS:
+        disp.print(str(minutes), posx=70, posy=50, font=display.FONT20)
 
-def render_months(disp):
-    localtime = utime.localtime()
-    months = localtime[1]
+
+def render_months(disp, months):
     for index in range(4):
         row1_segment_color = on_off_color_calc(int(months // 5), index)
         row2_segment_color = on_off_color_calc(months % 5, index)
         render_segment(disp, 1, index, row1_segment_color, Segment.quarter)
         render_segment(disp, 2, index, row2_segment_color, Segment.quarter)
 
+    if WITH_HINTS:
+        disp.print(str(months), posx=70, posy=10, font=display.FONT20)
 
-def render_days(disp):
-    localtime = utime.localtime()
-    days = localtime[2]
+
+def render_days(disp, days):
     for index in range(11):
         render_minute_x5(disp, index, days)
 
     for index in range(4):
         render_minute_x1(disp, index, days)
 
+    if WITH_HINTS:
+        disp.print(str(days), posx=70, posy=50, font=display.FONT20)
 
-def render_seconds(disp):
-    localtime = utime.localtime()
-    seconds = localtime[5]
+
+def render_seconds(disp, seconds):
+    render_second_hints(disp)
     secs = 60 if seconds is 0 else seconds
     start_x = 80
 
@@ -138,7 +147,6 @@ def render_seconds(disp):
 def render_second_hints(disp):
     for i in range(0, 161, 8):
         is_5er = i // 8 % 5 == 0
-        # color = Colors.white if is_5er else Colors.seconds
         color = Colors.seconds
 
         if is_5er:
@@ -157,38 +165,44 @@ def render_second_hints(disp):
                 disp.pixel(159, i, col=color)
 
 
-def render(disp):
-    render_bg(disp)
+def render(disp, display_brightness, led_brightness):
+
+    if WITH_BRIGHTNESS_ADJUST:
+        disp.backlight(display_brightness)
+
+    year, month, day, hours, mins, secs, _, _ = utime.localtime()
 
     if WITH_SECONDS:
-        render_seconds(disp)
-        render_second_hints(disp)
+        render_seconds(disp, secs)
+    if WITH_SECONDS_LED:
+        display_seconds(secs, led_brightness)
+
     if DATE_MODE:
-        render_months(disp)
-        render_days(disp)
+        render_months(disp, month)
+        render_days(disp, day)
     else:
-        render_hours(disp)
-        render_minutes(disp)
-    disp.update()
-    disp.close()
+        render_hours(disp, hours)
+        render_minutes(disp, mins)
 
 
-def display_seconds():
-    localtime = utime.localtime()
-    secs = localtime[5]
-    # second value is brightness of led (0 - 31)
-    leds.set_rocket(1, 31) if secs % 2 == 0 else leds.set_rocket(1, 0)
+def display_seconds(sec, intensity):
+    leds.set_rocket(1, intensity) if sec % 2 == 0 else leds.set_rocket(1, 0)
 
 
 # ==== configuration ==== #
 
-WITH_SECONDS = False
+WITH_SECONDS = True
+WITH_SECONDS_LED = True
 DATE_MODE = False
+WITH_HINTS = False
+WITH_BRIGHTNESS_ADJUST = True
+DEV_MODE = False
 
 
 def load_config():
     toggle_seconds_mode()
     toggle_date_mode()
+    toggle_hint_mode()
 
 
 def toggle_date_mode():
@@ -207,15 +221,27 @@ def toggle_seconds_mode():
         WITH_SECONDS = not WITH_SECONDS
 
 
+def toggle_hint_mode():
+    button = buttons.read(buttons.BOTTOM_RIGHT)
+    pressed = button != 0
+    if pressed:
+        global WITH_HINTS
+        WITH_HINTS = not WITH_HINTS
+
+
 # ==== execution ==== #
 
 def main():
     while True:
-        utime.sleep_ms(900)
-        display_seconds()
+        display_brightness, led_brightness, light = brightness()
         load_config()
-        with display.open() as disp:
-            render(disp)
+        with display.open() as _display:
+            _display.clear(col=Colors.background)
+            render(_display, display_brightness, led_brightness)
+            if DEV_MODE:
+                _display.print("light sensor: " + str(light), posx=0, posy=0, font=display.FONT8)
+            _display.update()
+        utime.sleep_ms(400)
 
 
 main()
