@@ -289,10 +289,11 @@ def setting_menu():
 # ==== execution ==== #
 
 def main():
+    light_sensor.start()
     while True:
         display_brightness, led_brightness, light = brightness()
         load_config()
-        setting_menu()
+        # setting_menu()
         with display.open() as _display:
             _display.clear(col=Colors.background)
             render(_display, display_brightness, led_brightness)
