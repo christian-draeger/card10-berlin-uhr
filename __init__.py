@@ -30,7 +30,7 @@ def brightness():
     display_brightness = 100 if light > 300 else display_brightness
     led_brightness = int(light // 10) if light >= 10 else 1
     led_brightness = 31 if light > 300 else led_brightness
-    return display_brightness, led_brightness, light
+    return display_brightness, led_brightness
 
 
 def render_segment(disp, row, pos, color, dimension):
@@ -116,36 +116,37 @@ def render_days(disp, days):
 
 
 def render_seconds(disp, seconds):
-    render_second_hints(disp)
-    secs = 60 if seconds is 0 else seconds
-    start_x = 80
+    if WITH_SECONDS:
+        render_second_markers(disp)
+        secs = 60 if seconds is 0 else seconds
+        start_x = 80
 
-    if secs > 0:
-        length = (secs - 0) * 8 if secs < 10 else 80
-        disp.rect(start_x, 0, length + start_x, 0, col=Colors.seconds, filled=True)
+        if secs > 0:
+            length = (secs - 0) * 8 if secs < 10 else 80
+            disp.rect(start_x, 0, length + start_x, 0, col=Colors.seconds, filled=True)
 
-    if secs > 10:
-        length = (secs - 10) * 8 if secs < 20 else 80
-        disp.rect(159, 0, 160, length, col=Colors.seconds, filled=True)
+        if secs > 10:
+            length = (secs - 10) * 8 if secs < 20 else 80
+            disp.rect(159, 0, 160, length, col=Colors.seconds, filled=True)
 
-    if secs > 20:
-        length = 160 - (secs - 20) * 8 if secs < 30 else 80
-        disp.rect(length, 79, 160, 80, col=Colors.seconds, filled=True)
+        if secs > 20:
+            length = 160 - (secs - 20) * 8 if secs < 30 else 80
+            disp.rect(length, 79, 160, 80, col=Colors.seconds, filled=True)
 
-    if secs > 30:
-        length = 80 - (secs - 30) * 8 if secs < 40 else 0
-        disp.rect(length, 79, 160, 80, col=Colors.seconds, filled=True)
+        if secs > 30:
+            length = 80 - (secs - 30) * 8 if secs < 40 else 0
+            disp.rect(length, 79, 160, 80, col=Colors.seconds, filled=True)
 
-    if secs > 40:
-        length = 80 - (secs - 40) * 8 if secs < 50 else 0
-        disp.rect(0, length, 0, 80, col=Colors.seconds, filled=True)
+        if secs > 40:
+            length = 80 - (secs - 40) * 8 if secs < 50 else 0
+            disp.rect(0, length, 0, 80, col=Colors.seconds, filled=True)
 
-    if secs > 50:
-        length = (secs - 50) * 8 if secs < 60 else 80
-        disp.rect(0, 0, length, 0, col=Colors.seconds, filled=True)
+        if secs > 50:
+            length = (secs - 50) * 8 if secs < 60 else 80
+            disp.rect(0, 0, length, 0, col=Colors.seconds, filled=True)
 
 
-def render_second_hints(disp):
+def render_second_markers(disp):
     for i in range(0, 161, 8):
         is_5er = i // 8 % 5 == 0
         color = Colors.seconds
@@ -166,24 +167,35 @@ def render_second_hints(disp):
                 disp.pixel(159, i, col=color)
 
 
-def render(disp, display_brightness, led_brightness):
-
-    if WITH_BRIGHTNESS_ADJUST:
-        disp.backlight(display_brightness)
-
+def render_gui(disp):
     year, month, day, hours, mins, secs, _, _ = utime.localtime()
 
-    if WITH_SECONDS:
-        render_seconds(disp, secs)
-    if WITH_SECONDS_LED:
-        display_seconds(secs, led_brightness)
+    global PREV_SECOND
+    if PREV_SECOND < secs:
+        disp.clear(col=Colors.background)
 
-    if DATE_MODE:
-        render_months(disp, month)
-        render_days(disp, day)
-    else:
-        render_hours(disp, hours)
-        render_minutes(disp, mins)
+        display_brightness, led_brightness = brightness()
+        if WITH_BRIGHTNESS_ADJUST:
+            disp.backlight(display_brightness)
+
+        if WITH_SECONDS_LED:
+            display_seconds(secs, led_brightness)
+
+        render_seconds(disp, secs)
+
+        if DATE_MODE:
+            render_months(disp, month)
+            render_days(disp, day)
+        else:
+            render_hours(disp, hours)
+            render_minutes(disp, mins)
+
+        disp.update()
+
+        if secs is 59:
+            PREV_SECOND = -1
+        else:
+            PREV_SECOND += 1
 
 
 def display_seconds(sec, intensity):
@@ -198,6 +210,7 @@ DATE_MODE = False
 WITH_HINTS = False
 WITH_BRIGHTNESS_ADJUST = True
 DEV_MODE = False
+PREV_SECOND = 0
 
 
 def load_config():
@@ -291,16 +304,10 @@ def setting_menu():
 def main():
     light_sensor.start()
     while True:
-        display_brightness, led_brightness, light = brightness()
         load_config()
         # setting_menu()
         with display.open() as _display:
-            _display.clear(col=Colors.background)
-            render(_display, display_brightness, led_brightness)
-            if DEV_MODE:
-                _display.print("light sensor: " + str(light), posx=0, posy=0, font=display.FONT8)
-            _display.update()
-        utime.sleep_ms(400)
+            render_gui(_display)
 
 
 main()
