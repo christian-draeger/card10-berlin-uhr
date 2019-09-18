@@ -7,21 +7,84 @@ import simple_menu
 
 
 class Colors(object):
-    background = (0, 0, 0)
+    black = (0, 0, 0)
     red_on = (255, 0, 0)
-    red_off = (60, 0, 0)
+    red_off = (51, 0, 0)
     yellow_on = (255, 255, 0)
-    yellow_off = (60, 60, 0)
-    seconds = (255, 128, 0)
-    white = (255, 255, 255)
+    yellow_off = (51, 51, 0)
+    blue_on = (70, 165, 255)
+    blue_off = (14, 33, 51)
+    green_on = (0, 255, 15)
+    green_off = (0, 51, 3)
+    orange = (255, 128, 0)
 
 
-class Segment(object):
-    # value is representing the width in px
-    half = 79
-    quarter = 39
-    sixth = 26
-    eleventh = 14
+SEGMENT_DESCRIPTION = {
+    "hours": {
+        "color_on": Colors.red_on,
+        "color_off": Colors.red_off,
+        "x5": {
+            "row": 1,
+            "offset": 0,
+            "amount": 4,
+            "width": 39
+        },
+        "x1": {
+            "row": 2,
+            "offset": 0,
+            "amount": 4,
+            "width": 39
+        }
+    },
+    "minutes": {
+        "color_on": Colors.yellow_on,
+        "color_off": Colors.yellow_off,
+        "x5": {
+            "row": 3,
+            "offset": 0,
+            "amount": 11,
+            "width": 14
+        },
+        "x1": {
+            "row": 4,
+            "offset": 0,
+            "amount": 4,
+            "width": 39
+        }
+    },
+    "days": {
+        "color_on": Colors.green_on,
+        "color_off": Colors.green_off,
+        "x5": {
+            "row": 1,
+            "offset": 0,
+            "amount": 6,
+            "width": 26
+        },
+        "x1": {
+            "row": 2,
+            "offset": 0,
+            "amount": 4,
+            "width": 39
+        }
+    },
+    "months": {
+        "color_on": Colors.blue_on,
+        "color_off": Colors.blue_off,
+        "x5": {
+            "row": 3,
+            "offset": 0,
+            "amount": 2,
+            "width": 79
+        },
+        "x1": {
+            "row": 4,
+            "offset": 0,
+            "amount": 4,
+            "width": 39
+        }
+    }
+}
 
 
 def brightness():
@@ -33,21 +96,16 @@ def brightness():
     return display_brightness, led_brightness
 
 
-def render_segment(disp, row, pos, color, dimension):
-    width = dimension
-    extra_offset = 1 if dimension == Segment.eleventh else 0
+def render_seg(disp, pos, color, seg_conf):
     height = 19
-    # hint: coordinate 0, 0 is on top left corner of display
-    disp.rect(width * pos + 2 + extra_offset,       # X-start coordinate
-              height * (row - 1) + 2,               # Y-start coordinate
-              width * (pos + 1) + extra_offset,     # X-End coordinate
-              height * row,                         # Y-End coordinate
-              col=color,
-              filled=True)
-
-
-def on_off_color_calc(active_segments, pos):
-    return Colors.red_on if active_segments > pos else Colors.red_off
+    width = seg_conf.get("width")
+    offset = seg_conf.get("offset")
+    row = seg_conf.get("row")
+    x_start = width * pos + 2 + offset
+    y_start = height * (row - 1) + 2
+    x_end = width * (pos + 1) + offset
+    y_end = height * row
+    disp.rect(x_start, y_start, x_end, y_end, col=color, filled=True)
 
 
 def render_minute_x5(disp, pos, minutes):
@@ -61,58 +119,38 @@ def render_minute_x5(disp, pos, minutes):
     if not active_segments and is_quarter:
         color = Colors.red_off
 
-    render_segment(disp, 3, pos, color, Segment.eleventh)
+    # render_segment(disp, 3, pos, color, Segment.eleventh)
 
 
-def render_minute_x1(disp, pos, minutes):
-    active_segments = minutes % 5
+def render_unit(disp, unit_conf, amount):
+    color_on = unit_conf.get("color_on")
+    color_off = unit_conf.get("color_off")
+    x5 = unit_conf.get("x5")
+    x1 = unit_conf.get("x1")
 
-    color = Colors.yellow_on if active_segments > pos else Colors.yellow_off
-    render_segment(disp, 4, pos, color, Segment.quarter)
+    for index in range(x5.get("amount")):
+        color = color_on if int(amount // 5) > index else color_off
+        render_seg(disp, index, color, x5)
+
+    for index in range(x1.get("amount")):
+        color = color_on if amount % 5 > index else color_off
+        render_seg(disp, index, color, x1)
 
 
-def render_hours(disp, hours):
-    for index in range(4):
-        row1_segment_color = on_off_color_calc(int(hours // 5), index)
-        row2_segment_color = on_off_color_calc(hours % 5, index)
-        render_segment(disp, 1, index, row1_segment_color, Segment.quarter)
-        render_segment(disp, 2, index, row2_segment_color, Segment.quarter)
-
+def render_date(disp, days, months):
+    render_unit(disp, SEGMENT_DESCRIPTION.get("days"), days)
+    render_unit(disp, SEGMENT_DESCRIPTION.get("months"), months)
     if WITH_HINTS:
-        disp.print(str(hours), posx=70, posy=10, font=display.FONT20)
+        disp.print('{:02}'.format(months), posx=70, posy=10, font=display.FONT20)
+        disp.print('{:02}'.format(days), posx=70, posy=50, font=display.FONT20)
 
 
-def render_minutes(disp, minutes):
-    for index in range(11):
-        render_minute_x5(disp, index, minutes)
-
-    for index in range(4):
-        render_minute_x1(disp, index, minutes)
-
+def render_time(disp, hours, minutes):
+    render_unit(disp, SEGMENT_DESCRIPTION.get("hours"), hours)
+    render_unit(disp, SEGMENT_DESCRIPTION.get("minutes"), minutes)
     if WITH_HINTS:
-        disp.print(str(minutes), posx=70, posy=50, font=display.FONT20)
-
-
-def render_months(disp, months):
-    for index in range(4):
-        row1_segment_color = on_off_color_calc(int(months // 5), index)
-        row2_segment_color = on_off_color_calc(months % 5, index)
-        render_segment(disp, 1, index, row1_segment_color, Segment.quarter)
-        render_segment(disp, 2, index, row2_segment_color, Segment.quarter)
-
-    if WITH_HINTS:
-        disp.print(str(months), posx=70, posy=10, font=display.FONT20)
-
-
-def render_days(disp, days):
-    for index in range(11):
-        render_minute_x5(disp, index, days)
-
-    for index in range(4):
-        render_minute_x1(disp, index, days)
-
-    if WITH_HINTS:
-        disp.print(str(days), posx=70, posy=50, font=display.FONT20)
+        disp.print('{:02}'.format(hours), posx=70, posy=10, font=display.FONT20)
+        disp.print('{:02}'.format(minutes), posx=70, posy=50, font=display.FONT20)
 
 
 def render_seconds(disp, seconds):
@@ -123,33 +161,33 @@ def render_seconds(disp, seconds):
 
         if secs > 0:
             length = (secs - 0) * 8 if secs < 10 else 80
-            disp.rect(start_x, 0, length + start_x, 0, col=Colors.seconds, filled=True)
+            disp.rect(start_x, 0, length + start_x, 0, col=Colors.orange, filled=True)
 
         if secs > 10:
             length = (secs - 10) * 8 if secs < 20 else 80
-            disp.rect(159, 0, 160, length, col=Colors.seconds, filled=True)
+            disp.rect(159, 0, 160, length, col=Colors.orange, filled=True)
 
         if secs > 20:
             length = 160 - (secs - 20) * 8 if secs < 30 else 80
-            disp.rect(length, 79, 160, 80, col=Colors.seconds, filled=True)
+            disp.rect(length, 79, 160, 80, col=Colors.orange, filled=True)
 
         if secs > 30:
             length = 80 - (secs - 30) * 8 if secs < 40 else 0
-            disp.rect(length, 79, 160, 80, col=Colors.seconds, filled=True)
+            disp.rect(length, 79, 160, 80, col=Colors.orange, filled=True)
 
         if secs > 40:
             length = 80 - (secs - 40) * 8 if secs < 50 else 0
-            disp.rect(0, length, 0, 80, col=Colors.seconds, filled=True)
+            disp.rect(0, length, 0, 80, col=Colors.orange, filled=True)
 
         if secs > 50:
             length = (secs - 50) * 8 if secs < 60 else 80
-            disp.rect(0, 0, length, 0, col=Colors.seconds, filled=True)
+            disp.rect(0, 0, length, 0, col=Colors.orange, filled=True)
 
 
 def render_second_markers(disp):
     for i in range(0, 161, 8):
         is_5er = i // 8 % 5 == 0
-        color = Colors.seconds
+        color = Colors.orange
 
         if is_5er:
             disp.circ(i, 0, 2, col=color, filled=True)
@@ -172,7 +210,7 @@ def render_gui(disp):
 
     global PREV_SECOND
     if PREV_SECOND < secs:
-        disp.clear(col=Colors.background)
+        disp.clear(col=Colors.black)
 
         display_brightness, led_brightness = brightness()
         if WITH_BRIGHTNESS_ADJUST:
@@ -184,11 +222,9 @@ def render_gui(disp):
         render_seconds(disp, secs)
 
         if DATE_MODE:
-            render_months(disp, month)
-            render_days(disp, day)
+            render_date(disp, day, month)
         else:
-            render_hours(disp, hours)
-            render_minutes(disp, mins)
+            render_time(disp, hours, mins)
 
         disp.update()
 
@@ -278,8 +314,8 @@ def brightness_adjust_toggle():
 
 
 class SettingsMenu(simple_menu.Menu):
-    color_1 = Colors.background
-    color_2 = Colors.background
+    color_1 = Colors.black
+    color_2 = Colors.black
     color_text = Colors.yellow_on
     color_sel = Colors.red_on
 
