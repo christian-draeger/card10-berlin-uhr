@@ -1,4 +1,5 @@
 import unittest
+import segement
 # sut = __import__("__init__.py")
 
 
@@ -17,6 +18,10 @@ class TestSum(unittest.TestCase):
         data = [1, 2, 3]
         result = summe(data)
         self.assertEqual(result, 6)
+
+    def test_segement(self):
+        time = segement.DESCRIPTION.get("time").get("top")
+        self.assertEqual(time, "")
 
 
 if __name__ == '__main__':
