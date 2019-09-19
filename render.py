@@ -1,3 +1,4 @@
+import display
 import segement as _segment
 
 
@@ -37,6 +38,36 @@ def unit(disp, unit_conf, amount):
         seg(disp, index, color, x1)
 
 
+def second(disp, seconds):
+    second_markers(disp)
+    secs = 60 if seconds is 0 else seconds
+    start_x = 80
+
+    if secs > 0:
+        length = (secs - 0) * 8 if secs < 10 else 80
+        disp.rect(start_x, 0, length + start_x, 0, col=_segment.Colors.orange, filled=True)
+
+    if secs > 10:
+        length = (secs - 10) * 8 if secs < 20 else 80
+        disp.rect(159, 0, 160, length, col=_segment.Colors.orange, filled=True)
+
+    if secs > 20:
+        length = 160 - (secs - 20) * 8 if secs < 30 else 80
+        disp.rect(length, 79, 160, 80, col=_segment.Colors.orange, filled=True)
+
+    if secs > 30:
+        length = 80 - (secs - 30) * 8 if secs < 40 else 0
+        disp.rect(length, 79, 160, 80, col=_segment.Colors.orange, filled=True)
+
+    if secs > 40:
+        length = 80 - (secs - 40) * 8 if secs < 50 else 0
+        disp.rect(0, length, 0, 80, col=_segment.Colors.orange, filled=True)
+
+    if secs > 50:
+        length = (secs - 50) * 8 if secs < 60 else 80
+        disp.rect(0, 0, length, 0, col=_segment.Colors.orange, filled=True)
+
+
 def second_markers(disp):
     for i in range(0, 161, 8):
         is_5er = i // 8 % 5 == 0
@@ -56,3 +87,14 @@ def second_markers(disp):
             else:
                 disp.pixel(0, i, col=color)
                 disp.pixel(159, i, col=color)
+
+
+def type(disp, type, top_unit, bottom_unit):
+    it = _segment.DESCRIPTION.get(type)
+    unit(disp, it.get("top"), top_unit)
+    unit(disp, it.get("bottom"), bottom_unit)
+
+
+def hint(disp, top_unit, bottom_unit):
+    disp.print('{:02}'.format(top_unit), posx=70, posy=10, font=display.FONT20)
+    disp.print('{:02}'.format(bottom_unit), posx=70, posy=50, font=display.FONT20)

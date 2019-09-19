@@ -5,6 +5,7 @@ import buttons
 import light_sensor
 import simple_menu
 import sys
+
 sys.path.append('/apps/berlin_uhr/')
 
 import segement as _segment
@@ -18,47 +19,6 @@ def brightness():
     led_brightness = int(light // 10) if light >= 10 else 1
     led_brightness = 31 if light > 300 else led_brightness
     return display_brightness, led_brightness
-
-
-def render_type(disp, type, top_unit, bottom_unit):
-    it = _segment.DESCRIPTION.get(type)
-    _render.unit(disp, it.get("top"), top_unit)
-    _render.unit(disp, it.get("bottom"), bottom_unit)
-
-    if WITH_HINTS:
-        disp.print('{:02}'.format(top_unit), posx=70, posy=10, font=display.FONT20)
-        disp.print('{:02}'.format(bottom_unit), posx=70, posy=50, font=display.FONT20)
-
-
-def render_seconds(disp, seconds):
-    if WITH_SECONDS:
-        _render.second_markers(disp)
-        secs = 60 if seconds is 0 else seconds
-        start_x = 80
-
-        if secs > 0:
-            length = (secs - 0) * 8 if secs < 10 else 80
-            disp.rect(start_x, 0, length + start_x, 0, col=_segment.Colors.orange, filled=True)
-
-        if secs > 10:
-            length = (secs - 10) * 8 if secs < 20 else 80
-            disp.rect(159, 0, 160, length, col=_segment.Colors.orange, filled=True)
-
-        if secs > 20:
-            length = 160 - (secs - 20) * 8 if secs < 30 else 80
-            disp.rect(length, 79, 160, 80, col=_segment.Colors.orange, filled=True)
-
-        if secs > 30:
-            length = 80 - (secs - 30) * 8 if secs < 40 else 0
-            disp.rect(length, 79, 160, 80, col=_segment.Colors.orange, filled=True)
-
-        if secs > 40:
-            length = 80 - (secs - 40) * 8 if secs < 50 else 0
-            disp.rect(0, length, 0, 80, col=_segment.Colors.orange, filled=True)
-
-        if secs > 50:
-            length = (secs - 50) * 8 if secs < 60 else 80
-            disp.rect(0, 0, length, 0, col=_segment.Colors.orange, filled=True)
 
 
 def render_gui(disp):
@@ -82,9 +42,13 @@ def render_gui(disp):
         if WITH_SECONDS_LED:
             display_seconds(secs, led_brightness)
 
-        render_seconds(disp, secs)
+        if WITH_SECONDS:
+            _render.second(disp, secs)
 
-        render_type(disp, MODE, first_unit, second_unit)
+        _render.type(disp, MODE, first_unit, second_unit)
+
+        if WITH_HINTS:
+            _render.hint(disp, first_unit, second_unit)
 
         disp.update()
 
