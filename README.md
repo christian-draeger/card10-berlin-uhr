@@ -49,8 +49,9 @@ Above the lines there is a round flashing light which is switched on or off ever
 <img width="260px" height="380px" align="left" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Mengenlehreuhr.jpg/800px-Mengenlehreuhr.jpg"/>
 <br />
   
-<h3>visit it 🙂</h3>
+### visit it 🙂
 The original clock can be visited at [Budapester Straße 5, Berlin](https://goo.gl/maps/dWd77VB7rNrN2gyT9) (next to the entrance of the Europa Center).
+
 <p align="center">
   <img width="400" height="800" src="picture.jpg">
 </p>
