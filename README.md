@@ -16,7 +16,9 @@ Releases can be found on [hatchery](https://badge.team/projects/berlin_Uhr).
 * displays seconds on the outer border of the display (can be turned on/off by lower left button)
 * press upper right button to display the current date in a berlin-uhr-ish style
 * press lower right button to show a overlay of clock/date in arabic numbers (good for beginners to learn how to read this clock)
-* automatically adjust the brightness of the display and the seconds LED
+* Power-Management / Power-Safing
+    * Automatically adjust brightness of display and the seconds LED to safe battery
+    * UI renders with 1FPS
 
 ## How to read the clock
 
@@ -45,5 +47,10 @@ Above the lines there is a round flashing light which is switched on or off ever
 <img width="260px" height="380px" align="left" src="https://upload.wikimedia.org/wikipedia/commons/1/13/Gedenktafel_Budapester_Str_45_%28Charl%29_Berlin_Uhr.jpg"/>
   
 <img width="260px" height="380px" align="left" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Mengenlehreuhr.jpg/800px-Mengenlehreuhr.jpg"/>
+<br />
   
-
+<h3>visit it 🙂</h3>
+The original clock can be visited at [Budapester Straße 5, Berlin](https://goo.gl/maps/dWd77VB7rNrN2gyT9) (next to the entrance of the Europa Center).
+<p align="center">
+  <img width="400" height="800" src="picture.jpg">
+</p>
