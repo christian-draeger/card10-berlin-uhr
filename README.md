@@ -40,6 +40,14 @@ The current hour results from the addition of the values. Accordingly, the minut
 Above the lines there is a round flashing light which is switched on or off every second.
 
 
+### visit it 🙂
+The original clock can be visited at [Budapester Straße 5, Berlin](https://goo.gl/maps/dWd77VB7rNrN2gyT9) (next to the entrance of the Europa Center).
+
+<p align="center">
+  <img width="400" height="800" src="picture.jpg"/>
+</p>
+
+
 ## The Original Clock:
 
 <img width="260px" height="380px" align="left" src="https://upload.wikimedia.org/wikipedia/commons/7/7b/Berlin_Kurf%C3%BCrstendamm_113714a.jpg"/>
@@ -47,11 +55,3 @@ Above the lines there is a round flashing light which is switched on or off ever
 <img width="260px" height="380px" align="left" src="https://upload.wikimedia.org/wikipedia/commons/1/13/Gedenktafel_Budapester_Str_45_%28Charl%29_Berlin_Uhr.jpg"/>
   
 <img width="260px" height="380px" align="left" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Mengenlehreuhr.jpg/800px-Mengenlehreuhr.jpg"/>
-<br />
-  
-### visit it 🙂
-The original clock can be visited at [Budapester Straße 5, Berlin](https://goo.gl/maps/dWd77VB7rNrN2gyT9) (next to the entrance of the Europa Center).
-
-<p align="center">
-  <img width="400" height="800" src="picture.jpg">
-</p>
