@@ -2,7 +2,6 @@ import utime
 import leds
 import display
 import buttons
-import light_sensor
 import simple_menu
 import sys
 
@@ -10,15 +9,7 @@ sys.path.append('/apps/berlin_uhr/')
 
 import segement as _segment
 import render as _render
-
-
-def brightness():
-    light = light_sensor.get_reading()
-    display_brightness = int(light // 4) if light >= 4 else 1
-    display_brightness = 100 if light > 300 else display_brightness
-    led_brightness = int(light // 10) if light >= 10 else 1
-    led_brightness = 31 if light > 300 else led_brightness
-    return display_brightness, led_brightness
+import brightness as _brightness
 
 
 def render_gui(disp):
@@ -35,7 +26,7 @@ def render_gui(disp):
     if PREV_SECOND < secs:
         disp.clear(col=_segment.Colors.black)
 
-        display_brightness, led_brightness = brightness()
+        display_brightness, led_brightness = _brightness.calculated()
         if WITH_BRIGHTNESS_ADJUST:
             disp.backlight(display_brightness)
 
@@ -67,7 +58,7 @@ def display_seconds(sec, intensity):
 WITH_SECONDS = True
 WITH_SECONDS_LED = True
 MODE = "time"
-WITH_HINTS = False
+WITH_HINTS = True
 WITH_BRIGHTNESS_ADJUST = True
 DEV_MODE = False
 PREV_SECOND = 0
@@ -165,7 +156,7 @@ def setting_menu():
 # ==== execution ==== #
 
 def main():
-    light_sensor.start()
+    _brightness.start_light_sensor()
     while True:
         load_config()
         # setting_menu()

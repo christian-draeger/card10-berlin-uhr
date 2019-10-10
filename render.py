@@ -96,5 +96,20 @@ def type(disp, type, top_unit, bottom_unit):
 
 
 def hint(disp, top_unit, bottom_unit):
-    disp.print('{:02}'.format(top_unit), posx=70, posy=10, font=display.FONT20)
-    disp.print('{:02}'.format(bottom_unit), posx=70, posy=50, font=display.FONT20)
+    pos_x = 38
+    pos_y = 28
+    disp.print('{:02}'.format(top_unit) + "-" + '{:02}'.format(bottom_unit),
+               fg=_segment.Colors.black, posx=pos_x - 1, posy=pos_y,
+               font=display.FONT24)
+    disp.print('{:02}'.format(top_unit) + "-" + '{:02}'.format(bottom_unit),
+               fg=_segment.Colors.black, posx=pos_x + 1, posy=pos_y,
+               font=display.FONT24)
+    disp.print('{:02}'.format(top_unit) + "-" + '{:02}'.format(bottom_unit),
+               fg=_segment.Colors.black, posx=pos_x, posy=pos_y - 1,
+               font=display.FONT24)
+    disp.print('{:02}'.format(top_unit) + "-" + '{:02}'.format(bottom_unit),
+               fg=_segment.Colors.black, posx=pos_x, posy=pos_y + 1,
+               font=display.FONT24)
+    disp.print('{:02}'.format(top_unit) + "-" + '{:02}'.format(bottom_unit),
+               fg=_segment.Colors.orange, posx=pos_x, posy=pos_y,
+               font=display.FONT24)
